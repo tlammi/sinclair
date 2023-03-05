@@ -1,7 +1,7 @@
 "use strict";
 var _a;
 exports.__esModule = true;
-exports.sinclair_to_weight = exports.sinclair_to_result = exports.sinclair_score = exports.sinclair_coefficient = exports.FEMALE_TO_MALE = exports.B_FEMALE = exports.A_FEMALE = exports.B_MALE = exports.A_MALE = void 0;
+exports.sinclair_to_weight = exports.sinclair_to_result = exports.sinclair_score = exports.sinclair_coefficient = exports.Sex = exports.FEMALE_TO_MALE = exports.B_FEMALE = exports.A_FEMALE = exports.B_MALE = exports.A_MALE = void 0;
 exports.A_MALE = 0.751945030;
 exports.B_MALE = 175.508;
 exports.A_FEMALE = 0.783497476;
@@ -20,7 +20,7 @@ var Sex;
 (function (Sex) {
     Sex[Sex["Male"] = 0] = "Male";
     Sex[Sex["Female"] = 1] = "Female";
-})(Sex || (Sex = {}));
+})(Sex = exports.Sex || (exports.Sex = {}));
 ;
 var COEFFICIENTS_BY_SEX = (_a = {},
     _a[Sex.Male] = [exports.A_MALE, exports.B_MALE],

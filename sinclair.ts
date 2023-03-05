@@ -19,7 +19,7 @@ const log10 = function(x){
 const sqrt = Math.sqrt;
 const pow = Math.pow;
 
-enum Sex{
+export enum Sex{
     Male,
     Female
 };
