@@ -71,11 +71,7 @@ export function sinclair_to_weight(sex: Sex){
         const tolerance = 0.01;
         if(kg >= score-tolerance) return b;
 
-        let log_b = log10(b);
-        let log_st = log10(score/kg);
-        let div = log_st/a;
-        let root = sqrt(div);
-        let exp = (log_b-root);
+        let exp = log10(b) - sqrt(log10(score/kg)/a);
         return pow(10,exp);
     }
 }

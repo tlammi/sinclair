@@ -68,11 +68,7 @@ function sinclair_to_weight(sex) {
         var tolerance = 0.01;
         if (kg >= score - tolerance)
             return b;
-        var log_b = log10(b);
-        var log_st = log10(score / kg);
-        var div = log_st / a;
-        var root = sqrt(div);
-        var exp = (log_b - root);
+        var exp = log10(b) - sqrt(log10(score / kg) / a);
         return pow(10, exp);
     };
 }
