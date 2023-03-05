@@ -1,7 +1,7 @@
 "use strict";
 var _a;
 exports.__esModule = true;
-exports.sinclair_to_result = exports.sinclair_score = exports.sinclair_coefficient = exports.FEMALE_TO_MALE = exports.B_FEMALE = exports.A_FEMALE = exports.B_MALE = exports.A_MALE = void 0;
+exports.sinclair_to_weight = exports.sinclair_to_result = exports.sinclair_score = exports.sinclair_coefficient = exports.FEMALE_TO_MALE = exports.B_FEMALE = exports.A_FEMALE = exports.B_MALE = exports.A_MALE = void 0;
 exports.A_MALE = 0.751945030;
 exports.B_MALE = 175.508;
 exports.A_FEMALE = 0.783497476;
@@ -14,6 +14,7 @@ var LOG10_BASE = Math.log(10);
 var log10 = function (x) {
     return Math.log(x) / LOG10_BASE;
 };
+var sqrt = Math.sqrt;
 var pow = Math.pow;
 var Sex;
 (function (Sex) {
@@ -35,14 +36,20 @@ function sinclair_coefficient(a, b, body_weight) {
     return pow(10, exp);
 }
 exports.sinclair_coefficient = sinclair_coefficient;
+/**
+ * (body_weight, kg) -> sinclair_score
+* */
 function sinclair_score(sex) {
-    return function (body_weight, result) {
+    return function (body_weight, kg) {
         var a = COEFFICIENTS_BY_SEX[sex][0];
         var b = COEFFICIENTS_BY_SEX[sex][1];
-        return sinclair_coefficient(a, b, body_weight) * result;
+        return sinclair_coefficient(a, b, body_weight) * kg;
     };
 }
 exports.sinclair_score = sinclair_score;
+/**
+ * (body_weight, sinclair_score) -> kg
+* */
 function sinclair_to_result(sex) {
     return function (body_weight, score) {
         var a = COEFFICIENTS_BY_SEX[sex][0];
@@ -51,5 +58,15 @@ function sinclair_to_result(sex) {
     };
 }
 exports.sinclair_to_result = sinclair_to_result;
-var sinclair_score_men = sinclair_score(Sex.Male);
-var sinclair_score_women = sinclair_score(Sex.Female);
+/**
+ * (kg, sinclair_score) -> body_weight
+* */
+function sinclair_to_weight(sex) {
+    return function (kg, score) {
+        var a = COEFFICIENTS_BY_SEX[sex][0];
+        var b = COEFFICIENTS_BY_SEX[sex][1];
+        var exp = sqrt(score / (a * kg));
+        return b * pow(10, exp);
+    };
+}
+exports.sinclair_to_weight = sinclair_to_weight;

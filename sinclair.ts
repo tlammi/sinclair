@@ -16,7 +16,7 @@ const LOG10_BASE = Math.log(10);
 const log10 = function(x){
     return Math.log(x) / LOG10_BASE;
 }
-
+const sqrt = Math.sqrt;
 const pow = Math.pow;
 
 enum Sex{
@@ -39,14 +39,20 @@ export function sinclair_coefficient(a, b, body_weight){
     return pow(10, exp);
 }
 
+/**
+ * (body_weight, kg) -> sinclair_score
+* */
 export function sinclair_score(sex: Sex){
-    return function(body_weight, result){
+    return function(body_weight, kg){
         let a = COEFFICIENTS_BY_SEX[sex][0];
         let b = COEFFICIENTS_BY_SEX[sex][1];
-        return sinclair_coefficient(a, b, body_weight)*result;
+        return sinclair_coefficient(a, b, body_weight)*kg;
     }
 }
 
+/**
+ * (body_weight, sinclair_score) -> kg
+* */
 export function sinclair_to_result(sex: Sex){
     return function(body_weight, score){
         let a = COEFFICIENTS_BY_SEX[sex][0];
@@ -55,6 +61,15 @@ export function sinclair_to_result(sex: Sex){
     }
 }
 
-const sinclair_score_men = sinclair_score(Sex.Male);
-const sinclair_score_women = sinclair_score(Sex.Female);
+/**
+ * (kg, sinclair_score) -> body_weight
+* */
+export function sinclair_to_weight(sex: Sex){
+    return function(kg, score){
+        let a = COEFFICIENTS_BY_SEX[sex][0];
+        let b = COEFFICIENTS_BY_SEX[sex][1];
+        let exp = sqrt(score/(a*kg));
+        return b*pow(10, exp);
+    }
+}
 
