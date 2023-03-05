@@ -34,10 +34,12 @@ try {
     for (var _i = 0, TEST_SUITE_1 = TEST_SUITE; _i < TEST_SUITE_1.length; _i++) {
         var data = TEST_SUITE_1[_i];
         var sex = data[0], bw = data[1], result = data[2], score = data[3];
+        var b = sl.COEFFICIENTS_BY_SEX[sex];
         assert_almost_eq(sl.sinclair_score(sex)(bw, result), score, "Sinclair Score");
         assert_almost_eq(sl.sinclair_to_result(sex)(bw, score), result, "Sinclair To Result");
-        // TODO: Fix
-        //assert_almost_eq(sl.sinclair_to_weight(sex)(result, score), bw, "Sinclair To Body Weight");
+        // If bw is higher than WR holder the bw is set to that.
+        bw = Math.max(bw, b);
+        assert_almost_eq(sl.sinclair_to_weight(sex)(result, score), bw, "Sinclair To Body Weight");
     }
 }
 catch (e) {

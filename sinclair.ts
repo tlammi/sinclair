@@ -24,7 +24,7 @@ export enum Sex{
     Female
 };
 
-const COEFFICIENTS_BY_SEX = {
+export const COEFFICIENTS_BY_SEX = {
     [Sex.Male]: [A_MALE, B_MALE],
     [Sex.Female]: [A_FEMALE, B_FEMALE]
 };
@@ -66,10 +66,17 @@ export function sinclair_to_result(sex: Sex){
 * */
 export function sinclair_to_weight(sex: Sex){
     return function(kg, score){
-        let a = COEFFICIENTS_BY_SEX[sex][0];
-        let b = COEFFICIENTS_BY_SEX[sex][1];
-        let exp = sqrt(score/(a*kg));
-        return b*pow(10, exp);
+        const a = COEFFICIENTS_BY_SEX[sex][0];
+        const b = COEFFICIENTS_BY_SEX[sex][1];
+        const tolerance = 0.01;
+        if(kg >= score-tolerance) return b;
+
+        let log_b = log10(b);
+        let log_st = log10(score/kg);
+        let div = log_st/a;
+        let root = sqrt(div);
+        let exp = (log_b-root);
+        return pow(10,exp);
     }
 }
 

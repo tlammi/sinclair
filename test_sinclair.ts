@@ -40,10 +40,13 @@ const TEST_SUITE = [
 try{
     for(var data of TEST_SUITE){
         let [sex, bw, result, score] = data;
+        let b = sl.COEFFICIENTS_BY_SEX[sex];
         assert_almost_eq(sl.sinclair_score(sex)(bw, result), score, "Sinclair Score");
         assert_almost_eq(sl.sinclair_to_result(sex)(bw, score), result, "Sinclair To Result");
-        // TODO: Fix
-        //assert_almost_eq(sl.sinclair_to_weight(sex)(result, score), bw, "Sinclair To Body Weight");
+
+        // If bw is higher than WR holder the bw is set to that.
+        bw = Math.max(bw, b);
+        assert_almost_eq(sl.sinclair_to_weight(sex)(result, score), bw, "Sinclair To Body Weight");
     }
 } catch(e){
     console.log(e);

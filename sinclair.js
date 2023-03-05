@@ -1,7 +1,7 @@
 "use strict";
 var _a;
 exports.__esModule = true;
-exports.sinclair_to_weight = exports.sinclair_to_result = exports.sinclair_score = exports.sinclair_coefficient = exports.Sex = exports.FEMALE_TO_MALE = exports.B_FEMALE = exports.A_FEMALE = exports.B_MALE = exports.A_MALE = void 0;
+exports.sinclair_to_weight = exports.sinclair_to_result = exports.sinclair_score = exports.sinclair_coefficient = exports.COEFFICIENTS_BY_SEX = exports.Sex = exports.FEMALE_TO_MALE = exports.B_FEMALE = exports.A_FEMALE = exports.B_MALE = exports.A_MALE = void 0;
 exports.A_MALE = 0.751945030;
 exports.B_MALE = 175.508;
 exports.A_FEMALE = 0.783497476;
@@ -22,7 +22,7 @@ var Sex;
     Sex[Sex["Female"] = 1] = "Female";
 })(Sex = exports.Sex || (exports.Sex = {}));
 ;
-var COEFFICIENTS_BY_SEX = (_a = {},
+exports.COEFFICIENTS_BY_SEX = (_a = {},
     _a[Sex.Male] = [exports.A_MALE, exports.B_MALE],
     _a[Sex.Female] = [exports.A_FEMALE, exports.B_FEMALE],
     _a);
@@ -41,8 +41,8 @@ exports.sinclair_coefficient = sinclair_coefficient;
 * */
 function sinclair_score(sex) {
     return function (body_weight, kg) {
-        var a = COEFFICIENTS_BY_SEX[sex][0];
-        var b = COEFFICIENTS_BY_SEX[sex][1];
+        var a = exports.COEFFICIENTS_BY_SEX[sex][0];
+        var b = exports.COEFFICIENTS_BY_SEX[sex][1];
         return sinclair_coefficient(a, b, body_weight) * kg;
     };
 }
@@ -52,8 +52,8 @@ exports.sinclair_score = sinclair_score;
 * */
 function sinclair_to_result(sex) {
     return function (body_weight, score) {
-        var a = COEFFICIENTS_BY_SEX[sex][0];
-        var b = COEFFICIENTS_BY_SEX[sex][1];
+        var a = exports.COEFFICIENTS_BY_SEX[sex][0];
+        var b = exports.COEFFICIENTS_BY_SEX[sex][1];
         return score / sinclair_coefficient(a, b, body_weight);
     };
 }
@@ -63,10 +63,17 @@ exports.sinclair_to_result = sinclair_to_result;
 * */
 function sinclair_to_weight(sex) {
     return function (kg, score) {
-        var a = COEFFICIENTS_BY_SEX[sex][0];
-        var b = COEFFICIENTS_BY_SEX[sex][1];
-        var exp = sqrt(score / (a * kg));
-        return b * pow(10, exp);
+        var a = exports.COEFFICIENTS_BY_SEX[sex][0];
+        var b = exports.COEFFICIENTS_BY_SEX[sex][1];
+        var tolerance = 0.01;
+        if (kg >= score - tolerance)
+            return b;
+        var log_b = log10(b);
+        var log_st = log10(score / kg);
+        var div = log_st / a;
+        var root = sqrt(div);
+        var exp = (log_b - root);
+        return pow(10, exp);
     };
 }
 exports.sinclair_to_weight = sinclair_to_weight;
