@@ -33,7 +33,7 @@ export const COEFFICIENTS_BY_SEX = {
 /**
  * 10^(a*X^2) where X is log10(body_weight/b)
 * */
-export function sinclair_coefficient(a, b, body_weight){
+export function sinclair_coeff(a, b, body_weight){
     if(body_weight > b) return 1.0;
     const exp = a*pow(log10(body_weight/b),2);
     return pow(10, exp);
@@ -46,25 +46,25 @@ export function sinclair_score(sex: Sex){
     return function(body_weight, kg){
         let a = COEFFICIENTS_BY_SEX[sex][0];
         let b = COEFFICIENTS_BY_SEX[sex][1];
-        return sinclair_coefficient(a, b, body_weight)*kg;
+        return sinclair_coeff(a, b, body_weight)*kg;
     }
 }
 
 /**
  * (body_weight, sinclair_score) -> kg
 * */
-export function sinclair_to_result(sex: Sex){
+export function sinclair_kg(sex: Sex){
     return function(body_weight, score){
         let a = COEFFICIENTS_BY_SEX[sex][0];
         let b = COEFFICIENTS_BY_SEX[sex][1];
-        return score / sinclair_coefficient(a, b, body_weight);
+        return score / sinclair_coeff(a, b, body_weight);
     }
 }
 
 /**
  * (kg, sinclair_score) -> body_weight
 * */
-export function sinclair_to_weight(sex: Sex){
+export function sinclair_bw(sex: Sex){
     return function(kg, score){
         const a = COEFFICIENTS_BY_SEX[sex][0];
         const b = COEFFICIENTS_BY_SEX[sex][1];

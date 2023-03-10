@@ -12,12 +12,12 @@ function assert_almost_eq(left, right, what="") {
 }
 
 try{
-    assert_almost_eq(sl.sinclair_coefficient(1,2,3),1);
+    assert_almost_eq(sl.sinclair_coeff(1,2,3),1);
     assert_almost_eq(
-        sl.sinclair_coefficient(
+        sl.sinclair_coeff(
             sl.A_MALE, sl.B_MALE, 100), 1.1088602597205108);
     assert_almost_eq(
-        sl.sinclair_coefficient(
+        sl.sinclair_coeff(
             sl.A_FEMALE, sl.B_FEMALE, 100), 1.0647936529571);
 } catch(e){
     console.log(e);
@@ -42,11 +42,11 @@ try{
         let [sex, bw, result, score] = data;
         let b = sl.COEFFICIENTS_BY_SEX[sex];
         assert_almost_eq(sl.sinclair_score(sex)(bw, result), score, "Sinclair Score");
-        assert_almost_eq(sl.sinclair_to_result(sex)(bw, score), result, "Sinclair To Result");
+        assert_almost_eq(sl.sinclair_kg(sex)(bw, score), result, "Sinclair To Result");
 
         // If bw is higher than WR holder the bw is set to that.
         bw = Math.max(bw, b);
-        assert_almost_eq(sl.sinclair_to_weight(sex)(result, score), bw, "Sinclair To Body Weight");
+        assert_almost_eq(sl.sinclair_bw(sex)(result, score), bw, "Sinclair To Body Weight");
     }
 } catch(e){
     console.log(e);
