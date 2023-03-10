@@ -1,7 +1,10 @@
 
 .PHONY: all test browser
 
-all: browser/sinclair.js
+all: browser/sinclair.js browser/sinclair_minified.js
+
+browser/%_minified.js: browser/%.js
+	npx minify --js < $< > $@
 
 browser/%.js: build/%.js
 	babel -o $@ $<
