@@ -1,11 +1,17 @@
 
-.PHONY: all test
+.PHONY: all test browser
 
-all: sinclair.js
+all: browser/sinclair.js
 
-test: test_sinclair.js sinclair.js
+browser/%.js: build/%.js
+	babel -o $@ $<
+
+test: build/test_sinclair.js build/sinclair.js
 	node $<
 
-%.js: %.ts
-	tsc $<
+build/%.js: %.ts
+	tsc --outDir build $<
+
+clean:
+	rm -rf browser build
 
