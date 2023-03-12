@@ -1,25 +1,6 @@
 (function () {
   'use strict';
 
-  var LOG10_BASE = Math.log(10);
-  var log10 = function (x) {
-    return Math.log(x) / LOG10_BASE;
-  };
-  var pow = Math.pow;
-  var Sex;
-  (function (Sex) {
-    Sex[Sex["Male"] = 0] = "Male";
-    Sex[Sex["Female"] = 1] = "Female";
-  })(Sex || (Sex = {}));
-  /**
-   * 10^(a*X^2) where X is log10(body_weight/b)
-  * */
-  function sinclair_coeff(a, b, body_weight) {
-    if (body_weight > b) return 1.0;
-    var exp = a * pow(log10(body_weight / b), 2);
-    return pow(10, exp);
-  }
-
   function createElement (query, ns) {
     var ref = parse(query);
     var tag = ref.tag;
@@ -400,25 +381,55 @@
     return html.bind.apply(html, [ this ].concat( args ));
   };
 
-  console.log(String(sinclair_coeff(1, 2, 100)));
+  var __spreadArray = this && this.__spreadArray || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+      if (ar || !(i in from)) {
+        if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+        ar[i] = from[i];
+      }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+  };
+  function line() {
+    var elems = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+      elems[_i] = arguments[_i];
+    }
+    var tds = [];
+    elems.forEach(function (elem) {
+      tds.push(el("td", elem));
+    });
+    return el.apply(void 0, __spreadArray(["tr"], tds, false));
+  }
+  function table() {
+    var rows = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+      rows[_i] = arguments[_i];
+    }
+    var tbody = el.apply(void 0, __spreadArray(["tbody"], rows, false));
+    return el("table", tbody);
+  }
   var sinclair_score = document.getElementById("sinclair_score");
   var sinclair_kg = document.getElementById("sinclair_kg");
   var sinclair_bw = document.getElementById("sinclair_bw");
   if (sinclair_score) {
-    var hello = el("h1", "Sinclair Score here");
-    mount(sinclair_score, hello);
+    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Tulos:", el("p", "tulos-kenttä")), line("Paino:", el("p", "paino...")), line(el("button", "Laske")), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Pisteet:", el("p", "pisteet tänne"))];
+    var tbl = table.apply(void 0, lines);
+    mount(sinclair_score, tbl);
   } else {
     console.log("sinclair_score not found");
   }
   if (sinclair_kg) {
-    var hello = el("h1", "Sinclair kg here");
-    mount(sinclair_kg, hello);
+    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Pisteet:", el("p", "piste-kenttä")), line("Paino:", el("p", "paino...")), line(el("button", "Laske")), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Tulos:", el("p", "tulos tänne"))];
+    var tbl = table.apply(void 0, lines);
+    mount(sinclair_score, tbl);
   } else {
     console.log("sinclair_kg not found");
   }
   if (sinclair_bw) {
-    var hello = el("h1", "Sinclair bw here");
-    mount(sinclair_bw, hello);
+    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Pisteet:", el("p", "piste-kenttä")), line("Tulos:", el("p", "tulos...")), line(el("button", "Laske")), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Paino:", el("p", "nostajan paino tänne"))];
+    var tbl = table.apply(void 0, lines);
+    mount(sinclair_score, tbl);
   } else {
     console.log("sinclair_bw not found");
   }

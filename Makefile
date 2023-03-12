@@ -15,7 +15,7 @@ build_test = build/test
 all: browser/bundle.js browser/bundle.min.js browser/index.html
 
 browser/bundle.js: $(build_browser)/sinclair.web.js $(build_browser)/sinclair.js $(build_browser)/redom.es.js
-	npx rollup  $< --file $@ --format iife
+	npx rollup --context this $< --file $@ --format iife
 
 test: $(build_test)/test_sinclair.js $(build_test)/sinclair.js
 	npx node $<
