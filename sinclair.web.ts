@@ -79,7 +79,7 @@ if(sinclair_kg){
         line("Tulos:", el("p", "tulos tänne")),
     ]
     let tbl = table(...lines);
-    mount(sinclair_score, tbl);
+    mount(sinclair_kg, tbl);
 } else {
     console.log("sinclair_kg not found");
 }
@@ -96,7 +96,7 @@ if(sinclair_bw){
         line("Paino:", el("p", "nostajan paino tänne")),
     ]
     let tbl = table(...lines);
-    mount(sinclair_score, tbl);
+    mount(sinclair_bw, tbl);
 } else {
     console.log("sinclair_bw not found");
 }

@@ -454,7 +454,7 @@
     });
     var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Pisteet:", el("p", "piste-kenttä")), line("Paino:", el("p", "paino...")), line(btn), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Tulos:", el("p", "tulos tänne"))];
     var tbl = table.apply(void 0, lines);
-    mount(sinclair_score, tbl);
+    mount(sinclair_kg, tbl);
   } else {
     console.log("sinclair_kg not found");
   }
@@ -465,7 +465,7 @@
     });
     var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Pisteet:", el("p", "piste-kenttä")), line("Tulos:", el("p", "tulos...")), line(btn), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Paino:", el("p", "nostajan paino tänne"))];
     var tbl = table.apply(void 0, lines);
-    mount(sinclair_score, tbl);
+    mount(sinclair_bw, tbl);
   } else {
     console.log("sinclair_bw not found");
   }
