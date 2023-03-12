@@ -41,13 +41,17 @@ export function sinclair_coeff(a, b, body_weight){
     return pow(10, exp);
 }
 
+export function sinclair_coeff_by_sex(sex: Sex, body_weight: number){
+    const [a, b] = sinclair_coeff_a_and_b(sex);
+    return sinclair_coeff(a, b, body_weight);
+}
+
 /**
  * (body_weight, kg) -> sinclair_score
 * */
 export function sinclair_score(sex: Sex){
     return function(body_weight, kg){
-        let a, b = sinclair_coeff_a_and_b(sex);
-        return sinclair_coeff(a, b, body_weight)*kg;
+        return sinclair_coeff_by_sex(sex, body_weight)*kg;
     }
 }
 

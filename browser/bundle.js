@@ -1,6 +1,47 @@
 (function () {
   'use strict';
 
+  var A_MALE = 0.751945030;
+  var B_MALE = 175.508;
+  var A_FEMALE = 0.783497476;
+  var B_FEMALE = 153.655;
+  var LOG10_BASE = Math.log(10);
+  var log10 = function (x) {
+    return Math.log(x) / LOG10_BASE;
+  };
+  var pow = Math.pow;
+  var Sex;
+  (function (Sex) {
+    Sex[Sex["Male"] = 0] = "Male";
+    Sex[Sex["Female"] = 1] = "Female";
+  })(Sex || (Sex = {}));
+  function sinclair_coeff_a_and_b(sex) {
+    if (sex == Sex.Male) return [A_MALE, B_MALE];
+    return [A_FEMALE, B_FEMALE];
+  }
+  /**
+   * 10^(a*X^2) where X is log10(body_weight/b)
+  * */
+  function sinclair_coeff(a, b, body_weight) {
+    if (body_weight > b) return 1.0;
+    var exp = a * pow(log10(body_weight / b), 2);
+    return pow(10, exp);
+  }
+  function sinclair_coeff_by_sex(sex, body_weight) {
+    var _a = sinclair_coeff_a_and_b(sex),
+      a = _a[0],
+      b = _a[1];
+    return sinclair_coeff(a, b, body_weight);
+  }
+  /**
+   * (body_weight, kg) -> sinclair_score
+  * */
+  function sinclair_score(sex) {
+    return function (body_weight, kg) {
+      return sinclair_coeff_by_sex(sex, body_weight) * kg;
+    };
+  }
+
   function createElement (query, ns) {
     var ref = parse(query);
     var tag = ref.tag;
@@ -409,6 +450,41 @@
     var tbody = el.apply(void 0, __spreadArray(["tbody"], rows, false));
     return el("table", tbody);
   }
+  function radio(group, option) {
+    var id = group + "-" + option;
+    var rdio = el("input", {
+      name: group,
+      id: id,
+      type: "radio",
+      value: option
+    });
+    var lbl = el("label", option, {
+      "for": id
+    });
+    return [rdio, lbl];
+  }
+  function radio_group(group, onclick) {
+    var options = [];
+    for (var _i = 2; _i < arguments.length; _i++) {
+      options[_i - 2] = arguments[_i];
+    }
+    var members = [];
+    var idx = 0;
+    function make_cb(i) {
+      return function () {
+        onclick(i);
+      };
+    }
+    options.forEach(function (opt) {
+      var _a = radio(group, opt),
+        rdio = _a[0],
+        lbl = _a[1];
+      rdio.addEventListener("click", make_cb(idx));
+      members.push(rdio, lbl);
+      ++idx;
+    });
+    return members;
+  }
   function button(label) {
     var btn = el("button", label);
     return btn;
@@ -420,54 +496,62 @@
     });
     return ipt;
   }
-  var sinclair_score = document.getElementById("sinclair_score");
-  var sinclair_kg = document.getElementById("sinclair_kg");
-  var sinclair_bw = document.getElementById("sinclair_bw");
-  if (sinclair_score) {
+  var sinclair_score_obj = document.getElementById("sinclair_score");
+  var sinclair_kg_obj = document.getElementById("sinclair_kg");
+  var sinclair_bw_obj = document.getElementById("sinclair_bw");
+  if (sinclair_score_obj) {
     var btn = button("Laske");
     var ipt_res_1 = input("");
     var ipt_bw_1 = input("");
     var coeff_1 = el("p");
     var out_1 = el("p");
+    var sex_1 = Sex.Male;
     var cb = function (event) {
       if (event.type == "click" || event.type == "keypress" && event.key == "Enter") {
         var res = Number(ipt_res_1.value);
         var bw = Number(ipt_bw_1.value);
-        console.log("res: " + String(res * bw));
-        coeff_1.innerHTML = "TBA";
-        out_1.innerHTML = "res: " + String(res * bw);
+        coeff_1.innerHTML = sinclair_coeff_by_sex(sex_1, bw);
+        console.log(bw);
+        console.log(res);
+        var scre = sinclair_score(sex_1)(bw, res);
+        console.log(scre);
+        out_1.innerHTML = scre;
       }
     };
     btn.addEventListener("click", cb);
     ipt_res_1.addEventListener("keypress", cb);
     ipt_bw_1.addEventListener("keypress", cb);
-    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Tulos:", ipt_res_1), line("Paino:", ipt_bw_1), line(btn), line("Sinclair-kerroin:", coeff_1), line("Pisteet:", out_1)];
+    var rd_grp = radio_group("formula", function (value) {
+      if (value == 1) sex_1 = Sex.Female;else sex_1 = Sex.Male;
+      console.log(value);
+    }, "mies", "nainen", "nainen miesten pisteillä");
+    var lines = [line("Laskentakaava:", rd_grp), line("Tulos:", ipt_res_1), line("Paino:", ipt_bw_1), line(btn), line("Sinclair-kerroin:", coeff_1), line("Pisteet:", out_1)];
     var tbl = table.apply(void 0, lines);
-    mount(sinclair_score, tbl);
+    mount(sinclair_score_obj, tbl);
   } else {
-    console.log("sinclair_score not found");
+    console.log("sinclair_score_obj not found");
   }
-  if (sinclair_kg) {
+  if (sinclair_kg_obj) {
     var btn = button("Laske");
     btn.addEventListener("click", function () {
       console.log("click2");
     });
     var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Pisteet:", el("p", "piste-kenttä")), line("Paino:", el("p", "paino...")), line(btn), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Tulos:", el("p", "tulos tänne"))];
     var tbl = table.apply(void 0, lines);
-    mount(sinclair_kg, tbl);
+    mount(sinclair_kg_obj, tbl);
   } else {
-    console.log("sinclair_kg not found");
+    console.log("sinclair_kg_obj not found");
   }
-  if (sinclair_bw) {
+  if (sinclair_bw_obj) {
     var btn = button("Laske");
     btn.addEventListener("click", function () {
       console.log("click3");
     });
     var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Pisteet:", el("p", "piste-kenttä")), line("Tulos:", el("p", "tulos...")), line(btn), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Paino:", el("p", "nostajan paino tänne"))];
     var tbl = table.apply(void 0, lines);
-    mount(sinclair_bw, tbl);
+    mount(sinclair_bw_obj, tbl);
   } else {
-    console.log("sinclair_bw not found");
+    console.log("sinclair_bw_obj not found");
   }
 
 })();
