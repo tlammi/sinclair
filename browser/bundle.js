@@ -409,25 +409,41 @@
     var tbody = el.apply(void 0, __spreadArray(["tbody"], rows, false));
     return el("table", tbody);
   }
+  function button(label) {
+    var btn = el("button", label);
+    return btn;
+  }
   var sinclair_score = document.getElementById("sinclair_score");
   var sinclair_kg = document.getElementById("sinclair_kg");
   var sinclair_bw = document.getElementById("sinclair_bw");
   if (sinclair_score) {
-    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Tulos:", el("p", "tulos-kenttä")), line("Paino:", el("p", "paino...")), line(el("button", "Laske")), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Pisteet:", el("p", "pisteet tänne"))];
+    var btn = button("Laske");
+    btn.addEventListener("click", function () {
+      console.log("clicked");
+    });
+    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Tulos:", el("p", "tulos-kenttä")), line("Paino:", el("p", "paino...")), line(btn), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Pisteet:", el("p", "pisteet tänne"))];
     var tbl = table.apply(void 0, lines);
     mount(sinclair_score, tbl);
   } else {
     console.log("sinclair_score not found");
   }
   if (sinclair_kg) {
-    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Pisteet:", el("p", "piste-kenttä")), line("Paino:", el("p", "paino...")), line(el("button", "Laske")), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Tulos:", el("p", "tulos tänne"))];
+    var btn = button("Laske");
+    btn.addEventListener("click", function () {
+      console.log("click2");
+    });
+    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Pisteet:", el("p", "piste-kenttä")), line("Paino:", el("p", "paino...")), line(btn), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Tulos:", el("p", "tulos tänne"))];
     var tbl = table.apply(void 0, lines);
     mount(sinclair_score, tbl);
   } else {
     console.log("sinclair_kg not found");
   }
   if (sinclair_bw) {
-    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Pisteet:", el("p", "piste-kenttä")), line("Tulos:", el("p", "tulos...")), line(el("button", "Laske")), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Paino:", el("p", "nostajan paino tänne"))];
+    var btn = button("Laske");
+    btn.addEventListener("click", function () {
+      console.log("click3");
+    });
+    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Pisteet:", el("p", "piste-kenttä")), line("Tulos:", el("p", "tulos...")), line(btn), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Paino:", el("p", "nostajan paino tänne"))];
     var tbl = table.apply(void 0, lines);
     mount(sinclair_score, tbl);
   } else {
