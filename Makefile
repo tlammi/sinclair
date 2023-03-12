@@ -7,10 +7,10 @@ all: browser/sinclair.js browser/sinclair.web.js \
 
 
 browser/bundle.js: browser/sinclair.web.js browser/sinclair.js browser/redom.es.js
-	npx rollup $< --file $@ --format iife #--name sinclair
+	npx rollup  $< --file $@ --format iife
 
-browser/redom.es.js: redom.es.js
-	cp redom.es.js browser/redom.es.js
+browser/redom.es.js:
+	ln -s ../redom.es.js browser/redom.es.js
 
 browser/%.min.js: browser/%.js
 	npx minify --js < $< > $@
