@@ -413,15 +413,35 @@
     var btn = el("button", label);
     return btn;
   }
+  function input(initial_value) {
+    var ipt = el("input", {
+      type: "text",
+      value: initial_value
+    });
+    return ipt;
+  }
   var sinclair_score = document.getElementById("sinclair_score");
   var sinclair_kg = document.getElementById("sinclair_kg");
   var sinclair_bw = document.getElementById("sinclair_bw");
   if (sinclair_score) {
     var btn = button("Laske");
-    btn.addEventListener("click", function () {
-      console.log("clicked");
-    });
-    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Tulos:", el("p", "tulos-kenttä")), line("Paino:", el("p", "paino...")), line(btn), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Pisteet:", el("p", "pisteet tänne"))];
+    var ipt_res_1 = input("");
+    var ipt_bw_1 = input("");
+    var coeff_1 = el("p");
+    var out_1 = el("p");
+    var cb = function (event) {
+      if (event.type == "click" || event.type == "keypress" && event.key == "Enter") {
+        var res = Number(ipt_res_1.value);
+        var bw = Number(ipt_bw_1.value);
+        console.log("res: " + String(res * bw));
+        coeff_1.innerHTML = "TBA";
+        out_1.innerHTML = "res: " + String(res * bw);
+      }
+    };
+    btn.addEventListener("click", cb);
+    ipt_res_1.addEventListener("keypress", cb);
+    ipt_bw_1.addEventListener("keypress", cb);
+    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Tulos:", ipt_res_1), line("Paino:", ipt_bw_1), line(btn), line("Sinclair-kerroin:", coeff_1), line("Pisteet:", out_1)];
     var tbl = table.apply(void 0, lines);
     mount(sinclair_score, tbl);
   } else {

@@ -20,20 +20,46 @@ function button(label){
     return btn;
 }
 
+function input(initial_value){
+    const ipt = el("input", {
+        type: "text",
+        value: initial_value,
+    });
+    return ipt;
+}
+
 const sinclair_score = document.getElementById("sinclair_score");
 const sinclair_kg = document.getElementById("sinclair_kg");
 const sinclair_bw = document.getElementById("sinclair_bw");
 
 if(sinclair_score){
     let btn = button("Laske");
-    btn.addEventListener("click", function(){console.log("clicked");});
+    let ipt_res = input("");
+    let ipt_bw = input("");
+    let coeff = el("p");
+    let out = el("p");
+
+    const cb = function(event){
+        if(event.type == "click" || (event.type == "keypress" && event.key == "Enter")){
+            let res = Number(ipt_res.value);
+            let bw = Number(ipt_bw.value);
+            console.log("res: " + String(res*bw));
+            coeff.innerHTML = "TBA";
+            out.innerHTML = "res: " + String(res*bw);
+        }
+    };
+
+    btn.addEventListener("click", cb);
+    ipt_res.addEventListener("keypress", cb);
+    ipt_bw.addEventListener("keypress", cb);
+
     let lines = [
         line("Laskentakaava:", el("p", "laskentakaava tänne")),
-        line("Tulos:", el("p", "tulos-kenttä")),
-        line("Paino:", el("p", "paino...")),
+        line("Tulos:", ipt_res),
+        line("Paino:", ipt_bw),
         line(btn),
-        line("Sinclair-kerroin:", el("p", "kerroin tänne")),
-        line("Pisteet:", el("p", "pisteet tänne")),
+        line("Sinclair-kerroin:", coeff),
+        line("Pisteet:", out),
     ]
     let tbl = table(...lines);
     mount(sinclair_score, tbl);
