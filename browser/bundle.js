@@ -1,11 +1,6 @@
 (function () {
   'use strict';
 
-  var _a;
-  var A_MALE = 0.751945030;
-  var B_MALE = 175.508;
-  var A_FEMALE = 0.783497476;
-  var B_FEMALE = 153.655;
   var LOG10_BASE = Math.log(10);
   var log10 = function (x) {
     return Math.log(x) / LOG10_BASE;
@@ -16,7 +11,6 @@
     Sex[Sex["Male"] = 0] = "Male";
     Sex[Sex["Female"] = 1] = "Female";
   })(Sex || (Sex = {}));
-  (_a = {}, _a[Sex.Male] = [A_MALE, B_MALE], _a[Sex.Female] = [A_FEMALE, B_FEMALE], _a);
   /**
    * 10^(a*X^2) where X is log10(body_weight/b)
   * */

@@ -40,7 +40,7 @@ const TEST_SUITE = [
 try{
     for(var data of TEST_SUITE){
         let [sex, bw, result, score] = data;
-        let b = sl.COEFFICIENTS_BY_SEX[sex];
+        let [_, b] = sl.sinclair_coeff_a_and_b(sex);
         assert_almost_eq(sl.sinclair_score(sex)(bw, result), score, "Sinclair Score");
         assert_almost_eq(sl.sinclair_kg(sex)(bw, score), result, "Sinclair To Result");
 

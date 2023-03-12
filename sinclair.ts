@@ -24,10 +24,12 @@ export enum Sex{
     Female
 };
 
-export const COEFFICIENTS_BY_SEX = {
-    [Sex.Male]: [A_MALE, B_MALE],
-    [Sex.Female]: [A_FEMALE, B_FEMALE]
-};
+
+export function sinclair_coeff_a_and_b(sex: Sex){
+    if(sex == Sex.Male)
+        return [A_MALE, B_MALE];
+    return [A_FEMALE, B_FEMALE];
+}
 
 
 /**
@@ -44,8 +46,7 @@ export function sinclair_coeff(a, b, body_weight){
 * */
 export function sinclair_score(sex: Sex){
     return function(body_weight, kg){
-        let a = COEFFICIENTS_BY_SEX[sex][0];
-        let b = COEFFICIENTS_BY_SEX[sex][1];
+        let a, b = sinclair_coeff_a_and_b(sex);
         return sinclair_coeff(a, b, body_weight)*kg;
     }
 }
@@ -55,8 +56,7 @@ export function sinclair_score(sex: Sex){
 * */
 export function sinclair_kg(sex: Sex){
     return function(body_weight, score){
-        let a = COEFFICIENTS_BY_SEX[sex][0];
-        let b = COEFFICIENTS_BY_SEX[sex][1];
+        let a, b = sinclair_coeff_a_and_b(sex);
         return score / sinclair_coeff(a, b, body_weight);
     }
 }
@@ -66,8 +66,7 @@ export function sinclair_kg(sex: Sex){
 * */
 export function sinclair_bw(sex: Sex){
     return function(kg, score){
-        const a = COEFFICIENTS_BY_SEX[sex][0];
-        const b = COEFFICIENTS_BY_SEX[sex][1];
+        let a, b = sinclair_coeff_a_and_b(sex);
         const tolerance = 0.01;
         if(kg >= score-tolerance) return b;
 
