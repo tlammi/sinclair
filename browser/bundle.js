@@ -9,6 +9,7 @@
   var log10 = function (x) {
     return Math.log(x) / LOG10_BASE;
   };
+  var sqrt = Math.sqrt;
   var pow = Math.pow;
   var Sex;
   (function (Sex) {
@@ -34,11 +35,17 @@
     return sinclair_coeff(a, b, body_weight);
   }
   /**
-   * (body_weight, kg) -> sinclair_score
+   * (kg, sinclair_score) -> body_weight
   * */
-  function sinclair_score(sex) {
-    return function (body_weight, kg) {
-      return sinclair_coeff_by_sex(sex, body_weight) * kg;
+  function sinclair_bw(sex) {
+    return function (kg, score) {
+      var _a = sinclair_coeff_a_and_b(sex),
+        a = _a[0],
+        b = _a[1];
+      var tolerance = 0.01;
+      if (kg >= score - tolerance) return b;
+      var exp = log10(b) - sqrt(log10(score / kg) / a);
+      return pow(10, exp);
     };
   }
 
@@ -485,8 +492,14 @@
     });
     return members;
   }
-  function button(label) {
+  function button(label, onclick) {
+    if (onclick === void 0) {
+      onclick = null;
+    }
     var btn = el("button", label);
+    if (onclick) {
+      btn.addEventListener("click", onclick);
+    }
     return btn;
   }
   function input(initial_value) {
@@ -496,62 +509,70 @@
     });
     return ipt;
   }
-  var sinclair_score_obj = document.getElementById("sinclair_score");
-  var sinclair_kg_obj = document.getElementById("sinclair_kg");
-  var sinclair_bw_obj = document.getElementById("sinclair_bw");
-  if (sinclair_score_obj) {
-    var btn = button("Laske");
-    var ipt_res_1 = input("");
-    var ipt_bw_1 = input("");
-    var coeff_1 = el("p");
-    var out_1 = el("p");
-    var sex_1 = Sex.Male;
-    var cb = function (event) {
-      if (event.type == "click" || event.type == "keypress" && event.key == "Enter") {
-        var res = Number(ipt_res_1.value);
-        var bw = Number(ipt_bw_1.value);
-        coeff_1.innerHTML = sinclair_coeff_by_sex(sex_1, bw);
-        console.log(bw);
-        console.log(res);
-        var scre = sinclair_score(sex_1)(bw, res);
-        console.log(scre);
-        out_1.innerHTML = scre;
+  /**
+   * Populate a sinclair calculator section
+   *
+   * @param {section_id} HTML id to populate
+   * @param {input1} Name of the 1st input field
+   * @param {input2} Name of the 2nd input field
+   * @param {output} Name of the output field
+  * */
+  function populate_section(section_id, input1, input2, output, output_fn) {
+    var obj = document.getElementById(section_id);
+    if (!obj) {
+      console.log("Could not find " + section_id);
+      return;
+    }
+    var ipt_1 = input("");
+    var ipt_2 = input("");
+    var coeff = el("p");
+    var out = el("p");
+    var sex = Sex.Male;
+    var populate_result_fields = function () {
+      var val_1 = Number(ipt_1.value);
+      var val_2 = Number(ipt_2.value);
+      var _a = output_fn(sex, val_1, val_2),
+        coeff_val = _a[0],
+        out_val = _a[1];
+      coeff.innerHTML = coeff_val;
+      out.innerHTML = out_val;
+    };
+    var cb = function (e) {
+      if (e.type == "click" || e.type == "keypress" && e.key == "Enter") {
+        populate_result_fields();
       }
     };
-    btn.addEventListener("click", cb);
-    ipt_res_1.addEventListener("keypress", cb);
-    ipt_bw_1.addEventListener("keypress", cb);
+    var btn = button("Laske", cb);
+    ipt_1.addEventListener("keypress", cb);
+    ipt_2.addEventListener("keypress", cb);
     var rd_grp = radio_group("formula", function (value) {
-      if (value == 1) sex_1 = Sex.Female;else sex_1 = Sex.Male;
+      if (value == 1) sex = Sex.Female;else sex = Sex.Male;
       console.log(value);
     }, "mies", "nainen", "nainen miesten pisteillä");
-    var lines = [line("Laskentakaava:", rd_grp), line("Tulos:", ipt_res_1), line("Paino:", ipt_bw_1), line(btn), line("Sinclair-kerroin:", coeff_1), line("Pisteet:", out_1)];
+    var lines = [line("Laskentakaava:", rd_grp), line(input1, ipt_1), line(input2, ipt_2), line(btn), line("Sinclair-kerroin: ", coeff), line(output, out)];
     var tbl = table.apply(void 0, lines);
-    mount(sinclair_score_obj, tbl);
-  } else {
-    console.log("sinclair_score_obj not found");
+    mount(obj, tbl);
   }
-  if (sinclair_kg_obj) {
-    var btn = button("Laske");
-    btn.addEventListener("click", function () {
-      console.log("click2");
-    });
-    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Pisteet:", el("p", "piste-kenttä")), line("Paino:", el("p", "paino...")), line(btn), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Tulos:", el("p", "tulos tänne"))];
-    var tbl = table.apply(void 0, lines);
-    mount(sinclair_kg_obj, tbl);
-  } else {
-    console.log("sinclair_kg_obj not found");
-  }
-  if (sinclair_bw_obj) {
-    var btn = button("Laske");
-    btn.addEventListener("click", function () {
-      console.log("click3");
-    });
-    var lines = [line("Laskentakaava:", el("p", "laskentakaava tänne")), line("Pisteet:", el("p", "piste-kenttä")), line("Tulos:", el("p", "tulos...")), line(btn), line("Sinclair-kerroin:", el("p", "kerroin tänne")), line("Paino:", el("p", "nostajan paino tänne"))];
-    var tbl = table.apply(void 0, lines);
-    mount(sinclair_bw_obj, tbl);
-  } else {
-    console.log("sinclair_bw_obj not found");
-  }
+  //const sinclair_score_obj = document.getElementById("sinclair_score");
+  //const sinclair_kg_obj = document.getElementById("sinclair_kg");
+  //const sinclair_bw_obj = document.getElementById("sinclair_bw");
+  var out_fn_score = function (sex, kg, bw) {
+    var coeff = sinclair_coeff_by_sex(sex, bw);
+    var score = coeff * kg;
+    return [coeff, score];
+  };
+  populate_section("sinclair_score", "Tulos:", "Paino:", "Pisteet:", out_fn_score);
+  var out_fn_kg = function (sex, score, bw) {
+    var coeff = sinclair_coeff_by_sex(sex, bw);
+    var kg = score / coeff;
+    return [coeff, kg];
+  };
+  populate_section("sinclair_kg", "Pisteet:", "Paino:", "Tulos:", out_fn_kg);
+  var out_fn_bw = function (sex, score, kg) {
+    var bw = sinclair_bw(sex)(kg, score);
+    var coeff = sinclair_coeff_by_sex(sex, bw);
+    return [coeff, bw];
+  };
+  populate_section("sinclair_bw", "Pisteet:", "Tulos:", "Paino:", out_fn_bw);
 
 })();

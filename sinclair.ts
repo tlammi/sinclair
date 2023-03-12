@@ -60,7 +60,7 @@ export function sinclair_score(sex: Sex){
 * */
 export function sinclair_kg(sex: Sex){
     return function(body_weight, score){
-        let a, b = sinclair_coeff_a_and_b(sex);
+        let [a, b] = sinclair_coeff_a_and_b(sex);
         return score / sinclair_coeff(a, b, body_weight);
     }
 }
@@ -70,7 +70,7 @@ export function sinclair_kg(sex: Sex){
 * */
 export function sinclair_bw(sex: Sex){
     return function(kg, score){
-        let a, b = sinclair_coeff_a_and_b(sex);
+        let [a, b] = sinclair_coeff_a_and_b(sex);
         const tolerance = 0.01;
         if(kg >= score-tolerance) return b;
 

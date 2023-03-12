@@ -1,7 +1,6 @@
 
-import {sinclair_coeff, sinclair_coeff_by_sex, sinclair_score, Sex} from "./sinclair";
+import {sinclair_coeff, sinclair_coeff_by_sex, sinclair_bw, Sex} from "./sinclair";
 import {el, mount} from './redom.es';
-
 
 
 function gen_id(prefix = ""){
@@ -52,8 +51,11 @@ function radio_group(group: String, onclick: (number) => void, ...options){
     return members;
 }
 
-function button(label){
-    const btn = el("button", label);
+function button(label, onclick = null){
+    let btn = el("button", label);
+    if(onclick){
+        btn.addEventListener("click", onclick);
+    }
     return btn;
 }
 
@@ -65,86 +67,94 @@ function input(initial_value){
     return ipt;
 }
 
-const sinclair_score_obj = document.getElementById("sinclair_score");
-const sinclair_kg_obj = document.getElementById("sinclair_kg");
-const sinclair_bw_obj = document.getElementById("sinclair_bw");
+/**
+ * Calculate outputs.
+ *
+ * Returns (sinclair coefficient, output value)
+ * */
+type OutputFn = (sex: Sex, input1: number, input2: number) =>[number, number];
 
-if(sinclair_score_obj){
-    let btn = button("Laske");
-    let ipt_res = input("");
-    let ipt_bw = input("");
+/**
+ * Populate a sinclair calculator section
+ *
+ * @param {section_id} HTML id to populate
+ * @param {input1} Name of the 1st input field
+ * @param {input2} Name of the 2nd input field
+ * @param {output} Name of the output field
+* */
+function populate_section(
+    section_id: string, input1: string, input2: string, output: string,
+    output_fn: OutputFn): void {
+    const obj = document.getElementById(section_id);
+    if(!obj){
+        console.log("Could not find " + section_id);
+        return;
+    }
+    let ipt_1 = input("");
+    let ipt_2 = input("");
     let coeff = el("p");
     let out = el("p");
-    let sex: Sex = Sex.Male;
+    let sex = Sex.Male;
 
-    const cb = function(event){
-        if(event.type == "click" || (event.type == "keypress" && event.key == "Enter")){
-            let res = Number(ipt_res.value);
-            let bw = Number(ipt_bw.value);
-            coeff.innerHTML = sinclair_coeff_by_sex(sex, bw);
-            console.log(bw);
-            console.log(res);
-            let scre = sinclair_score(sex)(bw, res);
-            console.log(scre);
-            out.innerHTML = scre;
+    const populate_result_fields = function(){
+        let val_1 = Number(ipt_1.value);
+        let val_2 = Number(ipt_2.value);
+        let [coeff_val, out_val] = output_fn(sex, val_1, val_2);
+        coeff.innerHTML = coeff_val;
+        out.innerHTML = out_val;
+    }
+
+    const cb = function(e){
+        if(e.type == "click" || (e.type == "keypress" && e.key == "Enter")){
+            populate_result_fields();
         }
-    };
-
-    btn.addEventListener("click", cb);
-    ipt_res.addEventListener("keypress", cb);
-    ipt_bw.addEventListener("keypress", cb);
+    }
+    let btn = button("Laske", cb);
+    ipt_1.addEventListener("keypress", cb);
+    ipt_2.addEventListener("keypress", cb);
 
     let rd_grp = radio_group("formula", function(value: number){ 
         if(value == 1) sex = Sex.Female;
         else sex = Sex.Male;
         console.log(value);},
-                             "mies", "nainen", "nainen miesten pisteillä");
+        "mies", "nainen", "nainen miesten pisteillä");
 
     let lines = [
         line("Laskentakaava:", rd_grp),
-        line("Tulos:", ipt_res),
-        line("Paino:", ipt_bw),
+        line(input1, ipt_1),
+        line(input2, ipt_2),
         line(btn),
-        line("Sinclair-kerroin:", coeff),
-        line("Pisteet:", out),
-    ]
+        line("Sinclair-kerroin: ", coeff),
+        line(output, out),
+    ];
+
     let tbl = table(...lines);
-    mount(sinclair_score_obj, tbl);
-} else {
-    console.log("sinclair_score_obj not found");
+    mount(obj, tbl);
+
 }
 
-if(sinclair_kg_obj){
-    let btn = button("Laske");
-    btn.addEventListener("click", function(){console.log("click2");});
-    let lines = [
-        line("Laskentakaava:", el("p", "laskentakaava tänne")),
-        line("Pisteet:", el("p", "piste-kenttä")),
-        line("Paino:", el("p", "paino...")),
-        line(btn),
-        line("Sinclair-kerroin:", el("p", "kerroin tänne")),
-        line("Tulos:", el("p", "tulos tänne")),
-    ]
-    let tbl = table(...lines);
-    mount(sinclair_kg_obj, tbl);
-} else {
-    console.log("sinclair_kg_obj not found");
+const out_fn_score = function(sex: Sex, kg: number, bw: number): [number, number] {
+    let coeff = sinclair_coeff_by_sex(sex, bw);
+    let score = coeff*kg;
+    return [coeff, score];
+};
+populate_section("sinclair_score", "Tulos:", "Paino:", "Pisteet:", out_fn_score);
+
+
+const out_fn_kg = function(sex: Sex, score: number, bw: number): [number, number] {
+    let coeff = sinclair_coeff_by_sex(sex, bw);
+    let kg = score/coeff;
+    return [coeff, kg];
 }
 
-if(sinclair_bw_obj){
-    let btn = button("Laske");
-    btn.addEventListener("click", function(){console.log("click3");});
-    let lines = [
-        line("Laskentakaava:", el("p", "laskentakaava tänne")),
-        line("Pisteet:", el("p", "piste-kenttä")),
-        line("Tulos:", el("p", "tulos...")),
-        line(btn),
-        line("Sinclair-kerroin:", el("p", "kerroin tänne")),
-        line("Paino:", el("p", "nostajan paino tänne")),
-    ]
-    let tbl = table(...lines);
-    mount(sinclair_bw_obj, tbl);
-} else {
-    console.log("sinclair_bw_obj not found");
+populate_section("sinclair_kg", "Pisteet:", "Paino:", "Tulos:", out_fn_kg);
+
+
+const out_fn_bw = function(sex: Sex, score: number, kg: number): [number, number] {
+    let bw = sinclair_bw(sex)(kg, score);
+    let coeff = sinclair_coeff_by_sex(sex, bw);
+    return [coeff, bw];
 }
+
+populate_section("sinclair_bw", "Pisteet:", "Tulos:", "Paino:", out_fn_bw);
 
