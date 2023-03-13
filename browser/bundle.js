@@ -553,9 +553,6 @@
     var tbl = table.apply(void 0, lines);
     mount(obj, tbl);
   }
-  //const sinclair_score_obj = document.getElementById("sinclair_score");
-  //const sinclair_kg_obj = document.getElementById("sinclair_kg");
-  //const sinclair_bw_obj = document.getElementById("sinclair_bw");
   var out_fn_score = function (sex, kg, bw) {
     var coeff = sinclair_coeff_by_sex(sex, bw);
     var score = coeff * kg;
