@@ -490,6 +490,7 @@
       members.push(rdio, lbl);
       ++idx;
     });
+    members[0].checked = true;
     return members;
   }
   function button(label, onclick) {
@@ -551,7 +552,7 @@
     var btn = button("Laske", cb);
     ipt_1.addEventListener("keypress", cb);
     ipt_2.addEventListener("keypress", cb);
-    var rd_grp = radio_group("formula", function (value) {
+    var rd_grp = radio_group(section_id + "-formula", function (value) {
       if (value == 1) sex = Sex.Female;else sex = Sex.Male;
       console.log(value);
     }, "mies", "nainen", "nainen miesten pisteillä");

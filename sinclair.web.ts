@@ -48,6 +48,7 @@ function radio_group(group: String, onclick: (number) => void, ...options){
         members.push(rdio, lbl);
         ++idx;
     });
+    members[0].checked = true;
     return members;
 }
 
@@ -120,7 +121,7 @@ function populate_section(
     ipt_1.addEventListener("keypress", cb);
     ipt_2.addEventListener("keypress", cb);
 
-    let rd_grp = radio_group("formula", function(value: number){ 
+    let rd_grp = radio_group(section_id + "-formula", function(value: number){ 
         if(value == 1) sex = Sex.Female;
         else sex = Sex.Male;
         console.log(value);},
@@ -137,7 +138,6 @@ function populate_section(
 
     let tbl = table(...lines);
     mount(obj, tbl);
-
 }
 
 const out_fn_score = function(sex: Sex, kg: number, bw: number): [number, number] {
