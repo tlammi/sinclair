@@ -125,7 +125,7 @@ function populate_section(
         if(value == 1) sex = Sex.Female;
         else sex = Sex.Male;
         console.log(value);},
-        "mies", "nainen", "nainen miesten pisteillä");
+        "mies", "nainen", "nainen \u2192 mies *");
 
     let lines = [
         line("Laskentakaava:", rd_grp),

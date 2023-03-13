@@ -555,7 +555,7 @@
     var rd_grp = radio_group(section_id + "-formula", function (value) {
       if (value == 1) sex = Sex.Female;else sex = Sex.Male;
       console.log(value);
-    }, "mies", "nainen", "nainen miesten pisteillä");
+    }, "mies", "nainen", "nainen \u2192 mies *");
     var lines = [line("Laskentakaava:", rd_grp), line(input1, ipt_1), line(input2, ipt_2), line(btn), line("Sinclair-kerroin: ", coeff), line(output, out)];
     var tbl = table.apply(void 0, lines);
     mount(obj, tbl);
