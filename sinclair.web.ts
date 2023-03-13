@@ -45,7 +45,7 @@ function radio_group(group: String, onclick: (number) => void, ...options){
     options.forEach(function(opt){
         let [rdio, lbl] = radio(group, opt);
         rdio.addEventListener("click", make_cb(idx));
-        members.push(rdio, lbl);
+        members.push(rdio, lbl, el("br"));
         ++idx;
     });
     members[0].checked = true;

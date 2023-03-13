@@ -487,7 +487,7 @@
         rdio = _a[0],
         lbl = _a[1];
       rdio.addEventListener("click", make_cb(idx));
-      members.push(rdio, lbl);
+      members.push(rdio, lbl, el("br"));
       ++idx;
     });
     members[0].checked = true;
