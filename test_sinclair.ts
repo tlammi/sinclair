@@ -11,6 +11,13 @@ function assert_almost_eq(left, right, what="") {
     }
 }
 
+function assert_ge(left, right, what=""){
+    if(left < right){
+        let msg = what + " left was smaller than right: " + left + " vs " + right;
+        throw new Error(msg);
+    }
+}
+
 try{
     assert_almost_eq(sl.sinclair_coeff(1,2,3),1);
     assert_almost_eq(
@@ -45,12 +52,22 @@ try{
         assert_almost_eq(sl.sinclair_kg(sex)(bw, score), result, "Sinclair To Result");
 
         // If bw is higher than WR holder the bw is set to that.
-        bw = Math.max(bw, b);
+        bw = Math.min(bw, b);
         assert_almost_eq(sl.sinclair_bw(sex)(result, score), bw, "Sinclair To Body Weight");
     }
 } catch(e){
     console.log(e);
     throw e;
+}
+
+assert_almost_eq(1, sl.sinclair_coeff_age(1));
+assert_almost_eq(1, sl.sinclair_coeff_age(20));
+
+let prev = 0;
+for(let i = 25; i < 120; ++i){
+    let cur = sl.sinclair_coeff_age(i);
+    assert_ge(cur, prev);
+    prev = cur;
 }
 
 
