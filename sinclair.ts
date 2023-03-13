@@ -133,6 +133,7 @@ export function sinclair_bw_extended(real_sex: Sex, projected_sex: Sex, age: num
         const coeff_sex = sinclair_coeff_sex(real_sex, projected_sex);
         const coeff_age = sinclair_coeff_age(age);
         let exp = log10(b) - sqrt(log10(score/(kg*coeff_sex*coeff_age))/a);
+        return pow(10, exp);
     }
 }
 

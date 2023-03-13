@@ -5,6 +5,10 @@ import * as sl from './sinclair'
 const TOLERANCE = 0.01;
 
 function assert_almost_eq(left, right, what="") {
+    if(isNaN(left) || isNaN(right)){
+        let msg = "got NaN: " + left + ", " + right;
+        throw new Error(msg);
+    }
     if(Math.abs(left - right) > TOLERANCE){
         let msg = what + ": not equal: " + left + " vs " + right;
         throw new Error(msg);

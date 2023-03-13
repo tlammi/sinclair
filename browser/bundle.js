@@ -13,6 +13,7 @@
   var log10 = function (x) {
     return Math.log(x) / LOG10_BASE;
   };
+  var sqrt = Math.sqrt;
   var pow = Math.pow;
   var Sex$1;
   (function (Sex) {
@@ -63,13 +64,15 @@
       age = 0;
     }
     return function (kg, score) {
-      var _a = sinclair_coeff_a_and_b(real_sex);
-        _a[0];
-        var b = _a[1];
+      var _a = sinclair_coeff_a_and_b(real_sex),
+        a = _a[0],
+        b = _a[1];
       var tolerance = 0.01;
       if (kg >= score - tolerance) return b;
-      sinclair_coeff_sex(real_sex, projected_sex);
-      sinclair_coeff_age(age);
+      var coeff_sex = sinclair_coeff_sex(real_sex, projected_sex);
+      var coeff_age = sinclair_coeff_age(age);
+      var exp = log10(b) - sqrt(log10(score / (kg * coeff_sex * coeff_age)) / a);
+      return pow(10, exp);
     };
   }
 
