@@ -559,11 +559,12 @@
     var ipt_2 = input("");
     var coeff = el("p");
     var out = el("p");
-    var sex = Sex.Male;
+    var real_sex = Sex.Male;
+    var projected_sex = Sex.Male;
     var populate_result_fields = function () {
       var val_1 = to_number(ipt_1.value);
       var val_2 = to_number(ipt_2.value);
-      var _a = output_fn(sex, sex, val_1, val_2),
+      var _a = output_fn(real_sex, projected_sex, val_1, val_2),
         coeff_val = _a[0],
         out_val = _a[1];
       coeff.innerHTML = coeff_val;
@@ -578,8 +579,20 @@
     ipt_1.addEventListener("keypress", cb);
     ipt_2.addEventListener("keypress", cb);
     var rd_grp = radio_group(section_id + "-formula", function (value) {
-      if (value == 1) sex = Sex.Female;else sex = Sex.Male;
-      console.log(value);
+      if (value == 0) {
+        real_sex = Sex.Male;
+        projected_sex = Sex.Male;
+      } else if (value == 1) {
+        real_sex = Sex.Female;
+        projected_sex = Sex.Female;
+      } else if (value == 2) {
+        real_sex = Sex.Female;
+        projected_sex = Sex.Male;
+      } else {
+        console.log("Unhandled value: " + value + " using Male");
+        real_sex = Sex.Male;
+        projected_sex = Sex.Male;
+      }
     }, "mies", "nainen", "nainen \u2192 mies *");
     var lines = [line("Laskentakaava:", rd_grp), line(input1, ipt_1), line(input2, ipt_2), line(btn), line("Sinclair-kerroin: ", coeff), line(output, out)];
     var tbl = table.apply(void 0, lines);

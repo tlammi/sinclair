@@ -109,12 +109,13 @@ function populate_section(
     let ipt_2 = input("");
     let coeff = el("p");
     let out = el("p");
-    let sex = Sex.Male;
+    let real_sex = Sex.Male;
+    let projected_sex = Sex.Male;
 
     const populate_result_fields = function(){
         let val_1 = to_number(ipt_1.value);
         let val_2 = to_number(ipt_2.value);
-        let [coeff_val, out_val] = output_fn(sex, sex, val_1, val_2);
+        let [coeff_val, out_val] = output_fn(real_sex, projected_sex, val_1, val_2);
         coeff.innerHTML = coeff_val;
         out.innerHTML = out_val;
     }
@@ -128,10 +129,21 @@ function populate_section(
     ipt_1.addEventListener("keypress", cb);
     ipt_2.addEventListener("keypress", cb);
 
-    let rd_grp = radio_group(section_id + "-formula", function(value: number){ 
-        if(value == 1) sex = Sex.Female;
-        else sex = Sex.Male;
-        console.log(value);},
+    let rd_grp = radio_group(section_id + "-formula", function(value: number){
+        if(value == 0){
+            real_sex = Sex.Male;
+            projected_sex = Sex.Male;
+        } else if(value == 1){
+            real_sex = Sex.Female;
+            projected_sex = Sex.Female;
+        } else if(value == 2){
+            real_sex = Sex.Female;
+            projected_sex = Sex.Male;
+        } else {
+            console.log("Unhandled value: " + value + " using Male");
+            real_sex = Sex.Male;
+            projected_sex = Sex.Male;
+        }},
         "mies", "nainen", "nainen \u2192 mies *");
 
     let lines = [
