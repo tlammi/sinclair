@@ -51,9 +51,26 @@ try{
         assert_almost_eq(sl.sinclair_score(sex)(bw, result), score, "Sinclair Score");
         assert_almost_eq(sl.sinclair_kg(sex)(bw, score), result, "Sinclair To Result");
 
+        // extended funcs
+        assert_almost_eq(
+            sl.sinclair_score(sex)(bw, result),
+            sl.sinclair_score_extended(sex, sex, 0)(bw, result),
+            "Extended sinclair score");
+        assert_almost_eq(
+            sl.sinclair_kg(sex)(bw, score),
+            sl.sinclair_kg_extended(sex, sex, 0)(bw, score),
+            "Extended sinclair to result");
+
+        assert_almost_eq(
+            sl.sinclair_bw(sex)(result, score),
+            sl.sinclair_bw_extended(sex, sex, 0)(result, score),
+            "Extended sinclair to bodyweight");
         // If bw is higher than WR holder the bw is set to that.
         bw = Math.min(bw, b);
         assert_almost_eq(sl.sinclair_bw(sex)(result, score), bw, "Sinclair To Body Weight");
+
+
+
     }
 } catch(e){
     console.log(e);

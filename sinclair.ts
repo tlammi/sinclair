@@ -41,6 +41,14 @@ export function sinclair_coeff(a, b, body_weight){
     return pow(10, exp);
 }
 
+export function sinclair_coeff_sex(real: Sex, projected: Sex): number{
+    if(real === Sex.Female && projected === Sex.Male)
+        return FEMALE_TO_MALE;
+    if(real === Sex.Male && projected === Sex.Female)
+        return 1/FEMALE_TO_MALE;
+    return 1;
+}
+
 export function sinclair_coeff_age(age: number): number{
     if(age < 30) age = 30;
     if(age > 90) age = 90;
@@ -64,12 +72,26 @@ export function sinclair_coeff_by_sex(sex: Sex, body_weight: number){
     return sinclair_coeff(a, b, body_weight);
 }
 
+export function sinclair_coeff_extended(
+    real_sex: Sex, projected_sex: Sex, bw: number, age: number = 0): number{
+        const coeff_sex = sinclair_coeff_sex(real_sex, projected_sex);
+        const coeff_age = sinclair_coeff_age(age);
+        const coeff_strd = sinclair_coeff_by_sex(real_sex, bw);
+        return coeff_sex*coeff_age*coeff_strd;
+}
+
 /**
  * (body_weight, kg) -> sinclair_score
 * */
 export function sinclair_score(sex: Sex){
     return function(body_weight, kg){
         return sinclair_coeff_by_sex(sex, body_weight)*kg;
+    }
+}
+
+export function sinclair_score_extended(real_sex: Sex, projected_sex: Sex, age: number = 0){
+    return function(bw, kg){
+        return sinclair_coeff_extended(real_sex, projected_sex, bw, age)*kg;
     }
 }
 
@@ -80,6 +102,12 @@ export function sinclair_kg(sex: Sex){
     return function(body_weight, score){
         let [a, b] = sinclair_coeff_a_and_b(sex);
         return score / sinclair_coeff(a, b, body_weight);
+    }
+}
+
+export function sinclair_kg_extended(real_sex: Sex, projected_sex: Sex, age: number = 0){
+    return function(bw, score){
+        return score / sinclair_coeff_extended(real_sex, projected_sex, bw, age);
     }
 }
 
@@ -94,6 +122,17 @@ export function sinclair_bw(sex: Sex){
 
         let exp = log10(b) - sqrt(log10(score/kg)/a);
         return pow(10,exp);
+    }
+}
+
+export function sinclair_bw_extended(real_sex: Sex, projected_sex: Sex, age: number = 0){
+    return function(kg, score){
+        let [a, b] = sinclair_coeff_a_and_b(real_sex);
+        const tolerance = 0.01;
+        if(kg >= score-tolerance) return b;
+        const coeff_sex = sinclair_coeff_sex(real_sex, projected_sex);
+        const coeff_age = sinclair_coeff_age(age);
+        let exp = log10(b) - sqrt(log10(score/(kg*coeff_sex*coeff_age))/a);
     }
 }
 
