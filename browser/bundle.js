@@ -5,19 +5,22 @@
   var B_MALE = 175.508;
   var A_FEMALE = 0.783497476;
   var B_FEMALE = 153.655;
+  /**
+   * Coefficient to convert female to male points
+  * */
+  var FEMALE_TO_MALE = 1.354;
   var LOG10_BASE = Math.log(10);
   var log10 = function (x) {
     return Math.log(x) / LOG10_BASE;
   };
-  var sqrt = Math.sqrt;
   var pow = Math.pow;
-  var Sex;
+  var Sex$1;
   (function (Sex) {
     Sex[Sex["Male"] = 0] = "Male";
     Sex[Sex["Female"] = 1] = "Female";
-  })(Sex || (Sex = {}));
+  })(Sex$1 || (Sex$1 = {}));
   function sinclair_coeff_a_and_b(sex) {
-    if (sex == Sex.Male) return [A_MALE, B_MALE];
+    if (sex == Sex$1.Male) return [A_MALE, B_MALE];
     return [A_FEMALE, B_FEMALE];
   }
   /**
@@ -28,24 +31,45 @@
     var exp = a * pow(log10(body_weight / b), 2);
     return pow(10, exp);
   }
+  function sinclair_coeff_sex(real, projected) {
+    if (real === Sex$1.Female && projected === Sex$1.Male) return FEMALE_TO_MALE;
+    if (real === Sex$1.Male && projected === Sex$1.Female) return 1 / FEMALE_TO_MALE;
+    return 1;
+  }
+  function sinclair_coeff_age(age) {
+    if (age < 30) age = 30;
+    if (age > 90) age = 90;
+    age -= 30;
+    var table = [1.000, 1.016, 1.031, 1.046, 1.059, 1.072, 1.083, 1.096, 1.109, 1.122, 1.135, 1.149, 1.162, 1.176, 1.189, 1.203, 1.218, 1.233, 1.248, 1.263, 1.279, 1.297, 1.316, 1.338, 1.361, 1.385, 1.411, 1.437, 1.462, 1.488, 1.514, 1.541, 1.568, 1.598, 1.629, 1.663, 1.699, 1.738, 1.779, 1.823, 1.867, 1.910, 1.953, 2.004, 2.060, 2.117, 2.181, 2.255, 2.336, 2.419, 2.504, 2.597, 2.702, 2.831, 2.981, 3.153, 3.352, 3.58, 3.843, 4.145, 4.493];
+    return table[age];
+  }
   function sinclair_coeff_by_sex(sex, body_weight) {
     var _a = sinclair_coeff_a_and_b(sex),
       a = _a[0],
       b = _a[1];
     return sinclair_coeff(a, b, body_weight);
   }
-  /**
-   * (kg, sinclair_score) -> body_weight
-  * */
-  function sinclair_bw(sex) {
+  function sinclair_coeff_extended(real_sex, projected_sex, bw, age) {
+    if (age === void 0) {
+      age = 0;
+    }
+    var coeff_sex = sinclair_coeff_sex(real_sex, projected_sex);
+    var coeff_age = sinclair_coeff_age(age);
+    var coeff_strd = sinclair_coeff_by_sex(real_sex, bw);
+    return coeff_sex * coeff_age * coeff_strd;
+  }
+  function sinclair_bw_extended(real_sex, projected_sex, age) {
+    if (age === void 0) {
+      age = 0;
+    }
     return function (kg, score) {
-      var _a = sinclair_coeff_a_and_b(sex),
-        a = _a[0],
-        b = _a[1];
+      var _a = sinclair_coeff_a_and_b(real_sex);
+        _a[0];
+        var b = _a[1];
       var tolerance = 0.01;
       if (kg >= score - tolerance) return b;
-      var exp = log10(b) - sqrt(log10(score / kg) / a);
-      return pow(10, exp);
+      sinclair_coeff_sex(real_sex, projected_sex);
+      sinclair_coeff_age(age);
     };
   }
 
@@ -438,6 +462,7 @@
     }
     return to.concat(ar || Array.prototype.slice.call(from));
   };
+  var Sex = Sex$1;
   function line() {
     var elems = [];
     for (var _i = 0; _i < arguments.length; _i++) {
@@ -538,7 +563,7 @@
     var populate_result_fields = function () {
       var val_1 = to_number(ipt_1.value);
       var val_2 = to_number(ipt_2.value);
-      var _a = output_fn(sex, val_1, val_2),
+      var _a = output_fn(sex, sex, val_1, val_2),
         coeff_val = _a[0],
         out_val = _a[1];
       coeff.innerHTML = coeff_val;
@@ -560,21 +585,21 @@
     var tbl = table.apply(void 0, lines);
     mount(obj, tbl);
   }
-  var out_fn_score = function (sex, kg, bw) {
-    var coeff = sinclair_coeff_by_sex(sex, bw);
+  var out_fn_score = function (real_sex, projected_sex, kg, bw) {
+    var coeff = sinclair_coeff_extended(real_sex, projected_sex, bw);
     var score = coeff * kg;
     return [coeff, score];
   };
   populate_section("sinclair_score", "Tulos:", "Paino:", "Pisteet:", out_fn_score);
-  var out_fn_kg = function (sex, score, bw) {
-    var coeff = sinclair_coeff_by_sex(sex, bw);
+  var out_fn_kg = function (real_sex, projected_sex, score, bw) {
+    var coeff = sinclair_coeff_extended(real_sex, projected_sex, bw);
     var kg = score / coeff;
     return [coeff, kg];
   };
   populate_section("sinclair_kg", "Pisteet:", "Paino:", "Tulos:", out_fn_kg);
-  var out_fn_bw = function (sex, score, kg) {
-    var bw = sinclair_bw(sex)(kg, score);
-    var coeff = sinclair_coeff_by_sex(sex, bw);
+  var out_fn_bw = function (real_sex, projected_sex, score, kg) {
+    var bw = sinclair_bw_extended(real_sex, projected_sex)(kg, score);
+    var coeff = sinclair_coeff_extended(real_sex, projected_sex, bw);
     return [coeff, bw];
   };
   populate_section("sinclair_bw", "Pisteet:", "Tulos:", "Paino:", out_fn_bw);

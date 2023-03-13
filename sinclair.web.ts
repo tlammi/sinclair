@@ -1,5 +1,11 @@
 
-import {sinclair_coeff, sinclair_coeff_by_sex, sinclair_bw, Sex} from "./sinclair";
+//import {sinclair_coeff, sinclair_coeff_by_sex, sinclair_bw, Sex} from "./sinclair";
+import * as sl from "./sinclair";
+
+import Sex = sl.Sex;
+import sinclair_coeff_by_sex = sl.sinclair_coeff_by_sex;
+import sinclair_bw = sl.sinclair_bw;
+
 import {el, mount} from './redom.es';
 
 
@@ -80,7 +86,8 @@ function to_number(val: string | number): number {
  *
  * Returns (sinclair coefficient, output value)
  * */
-type OutputFn = (sex: Sex, input1: number, input2: number) =>[number, number];
+type OutputFn = (real_sex: Sex, projected_sex: Sex,
+                 input1: number, input2: number) =>[number, number];
 
 /**
  * Populate a sinclair calculator section
@@ -107,7 +114,7 @@ function populate_section(
     const populate_result_fields = function(){
         let val_1 = to_number(ipt_1.value);
         let val_2 = to_number(ipt_2.value);
-        let [coeff_val, out_val] = output_fn(sex, val_1, val_2);
+        let [coeff_val, out_val] = output_fn(sex, sex, val_1, val_2);
         coeff.innerHTML = coeff_val;
         out.innerHTML = out_val;
     }
@@ -140,16 +147,17 @@ function populate_section(
     mount(obj, tbl);
 }
 
-const out_fn_score = function(sex: Sex, kg: number, bw: number): [number, number] {
-    let coeff = sinclair_coeff_by_sex(sex, bw);
+const out_fn_score = function(
+    real_sex: Sex, projected_sex: Sex, kg: number, bw: number): [number, number] {
+    let coeff = sl.sinclair_coeff_extended(real_sex, projected_sex, bw);
     let score = coeff*kg;
     return [coeff, score];
 };
 populate_section("sinclair_score", "Tulos:", "Paino:", "Pisteet:", out_fn_score);
 
 
-const out_fn_kg = function(sex: Sex, score: number, bw: number): [number, number] {
-    let coeff = sinclair_coeff_by_sex(sex, bw);
+const out_fn_kg = function(real_sex: Sex, projected_sex: Sex, score: number, bw: number): [number, number] {
+    let coeff = sl.sinclair_coeff_extended(real_sex, projected_sex, bw);
     let kg = score/coeff;
     return [coeff, kg];
 }
@@ -157,9 +165,9 @@ const out_fn_kg = function(sex: Sex, score: number, bw: number): [number, number
 populate_section("sinclair_kg", "Pisteet:", "Paino:", "Tulos:", out_fn_kg);
 
 
-const out_fn_bw = function(sex: Sex, score: number, kg: number): [number, number] {
-    let bw = sinclair_bw(sex)(kg, score);
-    let coeff = sinclair_coeff_by_sex(sex, bw);
+const out_fn_bw = function(real_sex: Sex, projected_sex: Sex, score: number, kg: number): [number, number] {
+    let bw = sl.sinclair_bw_extended(real_sex, projected_sex)(kg, score);
+    let coeff = sl.sinclair_coeff_extended(real_sex, projected_sex, bw);
     return [coeff, bw];
 }
 
