@@ -62,6 +62,8 @@ try{
 
 assert_almost_eq(1, sl.sinclair_coeff_age(1));
 assert_almost_eq(1, sl.sinclair_coeff_age(20));
+assert_almost_eq(sl.sinclair_coeff_age(1), sl.sinclair_coeff_age(2));
+assert_almost_eq(sl.sinclair_coeff_age(101), sl.sinclair_coeff_age(102));
 
 let prev = 0;
 for(let i = 25; i < 120; ++i){
