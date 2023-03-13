@@ -509,6 +509,12 @@
     });
     return ipt;
   }
+  function to_number(val) {
+    if (typeof val === 'number') {
+      return val;
+    }
+    return Number(val.replace(",", "."));
+  }
   /**
    * Populate a sinclair calculator section
    *
@@ -529,8 +535,8 @@
     var out = el("p");
     var sex = Sex.Male;
     var populate_result_fields = function () {
-      var val_1 = Number(ipt_1.value);
-      var val_2 = Number(ipt_2.value);
+      var val_1 = to_number(ipt_1.value);
+      var val_2 = to_number(ipt_2.value);
       var _a = output_fn(sex, val_1, val_2),
         coeff_val = _a[0],
         out_val = _a[1];

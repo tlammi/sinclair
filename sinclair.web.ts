@@ -67,6 +67,13 @@ function input(initial_value){
     return ipt;
 }
 
+function to_number(val: string | number): number {
+    if(typeof val === 'number'){
+        return val;
+    }
+    return Number(val.replace(",", "."))
+}
+
 /**
  * Calculate outputs.
  *
@@ -97,8 +104,8 @@ function populate_section(
     let sex = Sex.Male;
 
     const populate_result_fields = function(){
-        let val_1 = Number(ipt_1.value);
-        let val_2 = Number(ipt_2.value);
+        let val_1 = to_number(ipt_1.value);
+        let val_2 = to_number(ipt_2.value);
         let [coeff_val, out_val] = output_fn(sex, val_1, val_2);
         coeff.innerHTML = coeff_val;
         out.innerHTML = out_val;
