@@ -5,6 +5,23 @@
 import { sinclair } from './sinclair';
 
 export namespace app {
+
+  // Decimal separator
+  enum DecSep{
+      None,
+      Comma,
+      Dot,
+  };
+  /**
+   * Decide, based on multiple values, if the output should use comma or dot
+   */
+  function use_comma(... seps: DecSep[]): boolean {
+      for(let sep of seps){
+        if(sep === DecSep.Comma) return true;
+        else if(sep === DecSep.Dot) return false;
+      }
+      return false;
+  }
   /// Output precision
   const DECIMAL_DIGITS = 3;
 
@@ -59,15 +76,19 @@ export namespace app {
   }
 
   /**
-   * convert string to (number, uses_comma)
+   * convert string to (number, separator)
    *
    * "1.0" -> (1.0, false)
    * "10,2" -> (10.2, true)
    */
-  function to_number(input: Valued): [number, boolean] {
-    let has_comma = input.value.search(',') !== -1;
+  function to_number(input: Valued): [number, DecSep] {
+    let has_comma = input.value.indexOf(',') !== -1;
+    let has_dot = input.value.indexOf('.') !== -1;
     let val = input.value.replace(',', '.');
-    return [Number(val), has_comma];
+    let sep = DecSep.None;
+    if(has_comma) sep = DecSep.Comma;
+    else if(has_dot) sep = DecSep.Dot;
+    return [Number(val), sep];
   }
 
   function to_string(input: number, comma: boolean): string {
@@ -79,9 +100,9 @@ export namespace app {
   }
 
   export function extended_sinclair_score(args: Args): void {
-    let [lw, comma_lw] = to_number(args.lifted_weight);
-    let [bw, comma_bw] = to_number(args.body_weight);
-    let comma = comma_lw && comma_bw;
+    let [lw, sep_lw] = to_number(args.lifted_weight);
+    let [bw, sep_bw] = to_number(args.body_weight);
+    let comma = use_comma(sep_lw, sep_bw);
 
     const parsed = parse_args(args);
     let score = sinclair.score_extended(
@@ -105,9 +126,9 @@ export namespace app {
   }
 
   export function extended_sinclair_lifted_weight(args: Args): void {
-    let [score, comma_sc] = to_number(args.score);
-    let [bw, comma_bw] = to_number(args.body_weight);
-    let comma = comma_sc && comma_bw;
+    let [score, sep_sc] = to_number(args.score);
+    let [bw, sep_bw] = to_number(args.body_weight);
+    let comma = use_comma(sep_sc, sep_bw);
     const parsed = parse_args(args);
     let weight = sinclair.weight_extended(
       parsed.a,
@@ -129,9 +150,9 @@ export namespace app {
   }
 
   export function extended_sinclair_body_weight(args: Args): void {
-    const [lw, comma_lw] = to_number(args.lifted_weight);
-    const [sc, comma_sc] = to_number(args.score);
-    const comma = comma_sc && comma_lw;
+    const [lw, sep_lw] = to_number(args.lifted_weight);
+    const [sc, sep_sc] = to_number(args.score);
+    const comma = use_comma(sep_lw, sep_sc);
 
     const parsed = parse_args(args);
     const bw = sinclair.body_weight_extended(

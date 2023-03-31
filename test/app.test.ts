@@ -12,7 +12,7 @@ describe('sinclair score', () => {
   it('calculates with commas', () => {
     let args = new app.Args();
     args.lifted_weight.value = '68,2';
-    args.body_weight.value = '187,4';
+    args.body_weight.value = '187';
     app.extended_sinclair_score(args);
     expect(args.score.value).toMatch(new RegExp('[0-9]+,[0-9]+'));
     expect(args.coeff.value).toMatch(new RegExp('[0-9]+,[0-9]+'));

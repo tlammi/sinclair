@@ -880,6 +880,26 @@ var sinclair;
 // License: Any of the licenses in https://github.com/tlammi/sinclair/tree/licenses
 var app;
 (function (app) {
+  // Decimal separator
+  var DecSep;
+  (function (DecSep) {
+    DecSep[DecSep["None"] = 0] = "None";
+    DecSep[DecSep["Comma"] = 1] = "Comma";
+    DecSep[DecSep["Dot"] = 2] = "Dot";
+  })(DecSep || (DecSep = {}));
+  /**
+   * Decide, based on multiple values, if the output should use comma or dot
+   */
+  function use_comma() {
+    for (var _len = arguments.length, seps = new Array(_len), _key = 0; _key < _len; _key++) {
+      seps[_key] = arguments[_key];
+    }
+    for (var _i = 0, _seps = seps; _i < _seps.length; _i++) {
+      var sep = _seps[_i];
+      if (sep === DecSep.Comma) return true;else if (sep === DecSep.Dot) return false;
+    }
+    return false;
+  }
   /// Output precision
   var DECIMAL_DIGITS = 3;
   /// Valued type used for testing or for discarding values
@@ -927,15 +947,18 @@ var app;
     return out;
   }
   /**
-   * convert string to (number, uses_comma)
+   * convert string to (number, separator)
    *
    * "1.0" -> (1.0, false)
    * "10,2" -> (10.2, true)
    */
   function to_number(input) {
-    var has_comma = input.value.search(',') !== -1;
+    var has_comma = input.value.indexOf(',') !== -1;
+    var has_dot = input.value.indexOf('.') !== -1;
     var val = input.value.replace(',', '.');
-    return [Number(val), has_comma];
+    var sep = DecSep.None;
+    if (has_comma) sep = DecSep.Comma;else if (has_dot) sep = DecSep.Dot;
+    return [Number(val), sep];
   }
   function to_string(input, comma) {
     var str = input.toFixed(DECIMAL_DIGITS);
@@ -947,11 +970,11 @@ var app;
   function extended_sinclair_score(args) {
     var _to_number = to_number(args.lifted_weight),
       lw = _to_number[0],
-      comma_lw = _to_number[1];
+      sep_lw = _to_number[1];
     var _to_number2 = to_number(args.body_weight),
       bw = _to_number2[0],
-      comma_bw = _to_number2[1];
-    var comma = comma_lw && comma_bw;
+      sep_bw = _to_number2[1];
+    var comma = use_comma(sep_lw, sep_bw);
     var parsed = parse_args(args);
     var score = sinclair.score_extended(parsed.a, parsed.b, parsed.coeff_sex, parsed.coeff_age, bw, lw);
     var coeff = sinclair.coeff_extended(parsed.a, parsed.b, parsed.coeff_sex, parsed.coeff_age, bw);
@@ -962,11 +985,11 @@ var app;
   function extended_sinclair_lifted_weight(args) {
     var _to_number3 = to_number(args.score),
       score = _to_number3[0],
-      comma_sc = _to_number3[1];
+      sep_sc = _to_number3[1];
     var _to_number4 = to_number(args.body_weight),
       bw = _to_number4[0],
-      comma_bw = _to_number4[1];
-    var comma = comma_sc && comma_bw;
+      sep_bw = _to_number4[1];
+    var comma = use_comma(sep_sc, sep_bw);
     var parsed = parse_args(args);
     var weight = sinclair.weight_extended(parsed.a, parsed.b, parsed.coeff_sex, parsed.coeff_age, bw, score);
     var coeff = sinclair.coeff_extended(parsed.a, parsed.b, parsed.coeff_sex, parsed.coeff_age, bw);
@@ -977,11 +1000,11 @@ var app;
   function extended_sinclair_body_weight(args) {
     var _to_number5 = to_number(args.lifted_weight),
       lw = _to_number5[0],
-      comma_lw = _to_number5[1];
+      sep_lw = _to_number5[1];
     var _to_number6 = to_number(args.score),
       sc = _to_number6[0],
-      comma_sc = _to_number6[1];
-    var comma = comma_sc && comma_lw;
+      sep_sc = _to_number6[1];
+    var comma = use_comma(sep_lw, sep_sc);
     var parsed = parse_args(args);
     var bw = sinclair.body_weight_extended(parsed.a, parsed.b, parsed.coeff_sex, parsed.coeff_age, lw, sc);
     var coeff = sinclair.coeff_extended(parsed.a, parsed.b, parsed.coeff_sex, parsed.coeff_age, bw);
