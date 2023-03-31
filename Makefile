@@ -1,10 +1,14 @@
 
-.PHONY: bundle min build test lint lint-fix
+.PHONY: bundle min build test lint lint-fix release
 
 
 bundle: dist/bundle.js
 
 min: dist/bundle.min.js
+
+release: dist/bundle.js dist/bundle.min.js
+	mkdir -p release/
+	cp $^ release/
 
 dist/bundle.js: build
 	npx rollup -c
